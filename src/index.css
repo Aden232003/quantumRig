@@ -190,25 +190,56 @@
   animation: fadeIn 0.3s forwards;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.7; }
+}
+
+@keyframes cardBlur {
+  from {
+    backdrop-filter: blur(0px);
+    background: rgba(255, 255, 255, 0);
+  }
+  to {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .card-clone {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   backface-visibility: hidden;
 }
 
-/* Products page card entry animation */
-.card-container {
-  animation: cardEnter 0.6s ease-out;
+.card-content-blur {
+  position: absolute;
+  inset: 0;
+  animation: cardBlur 0.3s forwards;
+  z-index: 55;
 }
 
-@keyframes cardEnter {
-  from {
-    transform: translateY(30px) scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
+.card-clone-enter {
+  animation: cardSlideIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.card-clone-exit {
+  animation: slideOutToBottom 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Products page card entry animation */
+.card-container {
+  animation: slideInFromTop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeOut {
@@ -223,10 +254,56 @@
   animation-delay: calc(var(--card-index) * 0.1s);
 }
 
-/* Add line-clamp for truncating text */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+@keyframes shine {
+  0% {
+    background-position: 200% 200%;
+  }
+  100% {
+    background-position: -200% -200%;
+  }
+}
+
+.animate-shine {
+  animation: shine 8s linear infinite;
+}
+
+@keyframes cardFloatIn {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes cardSlideIn {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.card-float-in {
+  animation: cardFloatIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.card-slide-in {
+  animation: cardSlideIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideOutToBottom {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }

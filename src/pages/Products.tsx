@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Monitor, 
   Keyboard, 
@@ -27,6 +27,10 @@ import aegisHands from '/productImages/aegishands.png';
 import monitorMain from '/productImages/monitorMain.png';
 import monitor2 from '/productImages/monitor2.png';
 import monitor3 from '/productImages/monitor3.png';
+import pc1 from '/productImages/PC.png';
+import pc2 from '/productImages/pcKit.png';
+import pc3 from '/productImages/PCGPU.png';
+import fullSystem from '/productImages/FullPC.png';
 
 interface Product {
   id: number;
@@ -167,6 +171,54 @@ const products: Product[] = [
     limited: true,
     pieces: 35,
     color: "bg-emerald-900"
+  },
+  {
+    id: 11,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "High-performance gaming PC with RTX 4080, Intel i9, 64GB RAM",
+    price: "$2,999",
+    image: pc1,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-purple-900"
+  },
+  {
+    id: 12,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "Liquid-cooled system with custom loop and RGB lighting",
+    price: "$2,999",
+    image: pc2,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-blue-900"
+  },
+  {
+    id: 13,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "Premium build with tempered glass and aluminum chassis",
+    price: "$2,999",
+    image: pc3,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-indigo-900"
+  },
+  {
+    id: 14,
+    name: "Ultimate Setup",
+    category: "Full System",
+    description: "Complete gaming setup with PC, monitor, keyboard, and mouse",
+    price: "$4,999",
+    image: fullSystem,
+    model: "QR-ULTIMATE",
+    limited: true,
+    pieces: 10,
+    color: "bg-gray-900"
   }
 ];
 
@@ -196,6 +248,7 @@ const Products: React.FC = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
   const autoChangeRef = useRef<boolean>(true);
+  const navigate = useNavigate();
   
   const categories = [
     "KEYBOARD - FRONT",
@@ -213,7 +266,8 @@ const Products: React.FC = () => {
   const productCategories = [
     { id: "keyboards", name: "KEYBOARDS", icon: <Keyboard className="w-4 h-4" /> },
     { id: "mice", name: "MICE", icon: <Mouse className="w-4 h-4" /> },
-    { id: "monitors", name: "MONITORS", icon: <Monitor className="w-4 h-4" /> }
+    { id: "monitors", name: "MONITORS", icon: <Monitor className="w-4 h-4" /> },
+    { id: "pcs", name: "PCs", icon: <Cpu className="w-4 h-4" /> }
   ];
 
   // Define sizes for filters
@@ -239,6 +293,7 @@ const Products: React.FC = () => {
       case "keyboards": return keyboardProducts;
       case "mice": return mouseProducts;
       case "monitors": return monitorProducts;
+      case "pcs": return products.slice(10, 14);
       default: return keyboardProducts;
     }
   };
@@ -349,6 +404,45 @@ const Products: React.FC = () => {
     return 'bg-black/30';
   };
 
+  const handleWarrantyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.body.classList.add('page-transition');
+    
+    if (cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      
+      // Add blur effect to current card content
+      const blurOverlay = document.createElement('div');
+      blurOverlay.className = 'card-content-blur';
+      cardRef.current.appendChild(blurOverlay);
+      
+      // Create new card that will slide in
+      const newCard = cardRef.current.cloneNode(true) as HTMLElement;
+      newCard.style.position = 'fixed';
+      newCard.style.top = `${-rect.height}px`; // Start from above the viewport
+      newCard.style.left = `${rect.left}px`;
+      newCard.style.width = `${rect.width}px`;
+      newCard.style.height = `${rect.height}px`;
+      newCard.style.zIndex = '60';
+      newCard.className += ' card-clone card-clone-enter';
+      document.body.appendChild(newCard);
+      
+      // Navigate after animation
+      setTimeout(() => {
+        // Clean up
+        if (cardRef.current) {
+          cardRef.current.removeChild(blurOverlay);
+        }
+        document.body.removeChild(newCard);
+        document.body.classList.remove('page-transition');
+        navigate('/warranty');
+      }, 600);
+    } else {
+      // Fallback if card ref not available
+      navigate('/warranty');
+    }
+  };
+
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-100'} transition-colors duration-500 relative overflow-hidden`}>
       {/* Background blur with tint of the current product - OUTSIDE the card only */}
@@ -383,95 +477,48 @@ const Products: React.FC = () => {
                       className="text-gray-300 hover:text-white transition-colors"
                       onClick={(e) => {
                         e.preventDefault();
-                        // Add page transition animation class to body
                         document.body.classList.add('page-transition');
                         
-                        // Add overlay element
-                        const overlay = document.createElement('div');
-                        overlay.className = 'fixed inset-0 bg-black z-50 page-overlay';
-                        document.body.appendChild(overlay);
-                        
-                        // Clone current card and position it for animation
                         if (cardRef.current) {
                           const rect = cardRef.current.getBoundingClientRect();
-                          const clone = cardRef.current.cloneNode(true) as HTMLElement;
-                          clone.style.position = 'fixed';
-                          clone.style.top = `${rect.top}px`;
-                          clone.style.left = `${rect.left}px`;
-                          clone.style.width = `${rect.width}px`;
-                          clone.style.height = `${rect.height}px`;
-                          clone.style.zIndex = '60';
-                          clone.style.transition = 'all 0.5s ease-in-out';
-                          clone.style.transform = 'scale(1)';
-                          clone.className += ' card-clone';
-                          document.body.appendChild(clone);
                           
-                          // Animate the clone out
+                          // Add blur effect to current card content
+                          const blurOverlay = document.createElement('div');
+                          blurOverlay.className = 'card-content-blur';
+                          cardRef.current.appendChild(blurOverlay);
+                          
+                          // Create new card that will slide in
+                          const newCard = cardRef.current.cloneNode(true) as HTMLElement;
+                          newCard.style.position = 'fixed';
+                          newCard.style.top = `${-rect.height}px`; // Start from above the viewport
+                          newCard.style.left = `${rect.left}px`;
+                          newCard.style.width = `${rect.width}px`;
+                          newCard.style.height = `${rect.height}px`;
+                          newCard.style.zIndex = '60';
+                          newCard.className += ' card-clone card-clone-enter';
+                          document.body.appendChild(newCard);
+                          
+                          // Navigate after animation
                           setTimeout(() => {
-                            clone.style.transform = 'scale(0.9) translateY(30px)';
-                            clone.style.opacity = '0';
-                            
-                            // Navigate after animation completes
-                            setTimeout(() => {
-                              window.location.href = '/home';
-                            }, 500);
-                          }, 100);
+                            // Clean up
+                            if (cardRef.current) {
+                              cardRef.current.removeChild(blurOverlay);
+                            }
+                            document.body.removeChild(newCard);
+                            document.body.classList.remove('page-transition');
+                            navigate('/home');
+                          }, 600);
                         } else {
                           // Fallback if card ref not available
-                          setTimeout(() => {
-                            window.location.href = '/home';
-                          }, 600);
+                          navigate('/home');
                         }
                       }}
                     >HOME</Link>
                     <Link to="/products" className="text-white transition-colors border-b border-amber-500 pb-1">PRODUCTS</Link>
-                    <Link to="/watches" 
+                    <Link to="/warranty" 
                       className="text-gray-300 hover:text-white transition-colors"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // Add page transition animation class to body
-                        document.body.classList.add('page-transition');
-                        
-                        // Add overlay element
-                        const overlay = document.createElement('div');
-                        overlay.className = 'fixed inset-0 bg-black z-50 page-overlay';
-                        document.body.appendChild(overlay);
-                        
-                        // Clone current card and position it for animation
-                        if (cardRef.current) {
-                          const rect = cardRef.current.getBoundingClientRect();
-                          const clone = cardRef.current.cloneNode(true) as HTMLElement;
-                          clone.style.position = 'fixed';
-                          clone.style.top = `${rect.top}px`;
-                          clone.style.left = `${rect.left}px`;
-                          clone.style.width = `${rect.width}px`;
-                          clone.style.height = `${rect.height}px`;
-                          clone.style.zIndex = '60';
-                          clone.style.transition = 'all 0.5s ease-in-out';
-                          clone.style.transform = 'scale(1)';
-                          clone.className += ' card-clone';
-                          document.body.appendChild(clone);
-                          
-                          // Animate the clone out
-                          setTimeout(() => {
-                            clone.style.transform = 'scale(1.1) translateY(-30px)';
-                            clone.style.opacity = '0';
-                            
-                            // Navigate after animation completes
-                            setTimeout(() => {
-                              window.location.href = '/watches';
-                            }, 500);
-                          }, 100);
-                        } else {
-                          // Fallback if card ref not available
-                          setTimeout(() => {
-                            window.location.href = '/watches';
-                          }, 600);
-                        }
-                      }}
-                    >WATCHES</Link>
-                    <a href="#" className="text-gray-300 hover:text-white transition-colors">WARRANTY & SERVICE</a>
-                    <a href="#" className="text-gray-300 hover:text-white transition-colors">STORES</a>
+                      onClick={handleWarrantyClick}
+                    >WARRANTY & SERVICE</Link>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 sm:space-x-6">
@@ -491,37 +538,37 @@ const Products: React.FC = () => {
           </div>
 
           {/* Filter Options */}
-          <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 border-b border-gray-800/30 relative z-10 flex-shrink-0">
+          <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-5 md:py-6 border-b border-gray-800/30 relative z-10 flex-shrink-0">
             <div className="flex flex-wrap justify-between items-center">
               {/* Functions / Categories */}
-              <div className="mb-0">
-                <div className="text-gray-400 text-xs uppercase mb-1">Functions</div>
+              <div className="mb-2 sm:mb-0">
+                <div className="text-gray-400 text-xs uppercase mb-2">Functions</div>
                 <div className="flex items-center space-x-2">
                   {productCategories.map((category) => (
                     <button 
                       key={category.id}
                       onClick={() => setActiveCategory(category.id)}
-                      className={`rounded-full flex items-center justify-center p-2 ${activeCategory === category.id ? 'bg-amber-500 text-white' : 'bg-gray-800 text-gray-400'} transition-colors duration-300`}
+                      className={`rounded-full flex items-center justify-center p-3 ${activeCategory === category.id ? 'bg-amber-500 text-white' : 'bg-gray-800 text-gray-400'} transition-colors duration-300`}
                     >
                       {category.icon}
                     </button>
                   ))}
-                  <div className="border border-gray-700 h-5 mx-1" />
-                  <div className="flex items-center bg-gray-800/50 rounded-full px-3 py-1">
-                    <span className="text-white text-xs">FEATURES</span>
-                    <ChevronDown className="w-3 h-3 text-gray-400 ml-1" />
+                  <div className="border border-gray-700 h-6 mx-2" />
+                  <div className="flex items-center bg-gray-800/50 rounded-full px-4 py-1">
+                    <span className="text-white text-xs">SPECIAL FEATURES</span>
+                    <ChevronDown className="w-3 h-3 text-gray-400 ml-2" />
                   </div>
                 </div>
               </div>
               
               {/* Sizes */}
               <div>
-                <div className="text-gray-400 text-xs uppercase mb-1">Sizes</div>
+                <div className="text-gray-400 text-xs uppercase mb-2">Sizes</div>
                 <div className="flex items-center space-x-1">
                   {sizes.map(size => (
                     <div 
                       key={size} 
-                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-800 flex items-center justify-center text-xs text-white cursor-pointer hover:bg-gray-700 transition-colors"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs text-white cursor-pointer hover:bg-gray-700 transition-colors"
                     >
                       {size}
                     </div>
@@ -531,12 +578,12 @@ const Products: React.FC = () => {
               
               {/* Materials */}
               <div>
-                <div className="text-gray-400 text-xs uppercase mb-1">Materials <span className="text-amber-500">RED</span></div>
+                <div className="text-gray-400 text-xs uppercase mb-2">Materials <span className="text-amber-500">RED GOLD</span></div>
                 <div className="flex items-center space-x-1">
                   {materials.map((material, index) => (
                     <div 
                       key={index} 
-                      className={`w-6 h-6 rounded-full ${material.color} cursor-pointer hover:ring hover:ring-white/30 transition-all duration-300`}
+                      className={`w-7 h-7 rounded-full ${material.color} cursor-pointer hover:ring hover:ring-white/30 transition-all duration-300`}
                     />
                   ))}
                 </div>
@@ -545,7 +592,7 @@ const Products: React.FC = () => {
               {/* Search */}
               <div>
                 <button className="bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition-colors duration-300">
-                  <Search className="w-4 h-4 text-white" />
+                  <Search className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>
@@ -554,10 +601,12 @@ const Products: React.FC = () => {
           {/* Product Display Area */}
           <div className="p-4 sm:p-6 md:p-8 lg:p-10 relative z-10 flex-grow overflow-y-auto">
             {/* Product Category Title */}
-            <div className="mb-3 sm:mb-4">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl text-white font-light tracking-wider">
+            <div className="mb-4">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl text-white font-light tracking-wider">
                 {activeCategory === "keyboards" ? "AEGIS PRO" : 
-                 activeCategory === "mice" ? "NOVA SPECTER" : "QUANTUM DISPLAY"}
+                 activeCategory === "mice" ? "NOVA SPECTER" : 
+                 activeCategory === "monitors" ? "QUANTUM DISPLAY" :
+                 "QUANTUM CORE"}
               </h2>
               <div className="mt-1 flex items-center">
                 <div className="flex space-x-1">
@@ -580,30 +629,29 @@ const Products: React.FC = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
               {getCurrentProducts().map((product, index) => (
                 <div 
                   key={index} 
-                  className="bg-black/40 rounded-2xl overflow-hidden group cursor-pointer product-card" 
+                  className="bg-black/20 rounded-2xl overflow-hidden group cursor-pointer product-card h-[380px] flex flex-col" 
                   style={{"--card-index": index} as React.CSSProperties}
                 >
-                  <div className="p-2 relative">
-                    <div className="absolute top-2 left-2 bg-black/60 px-2 py-0.5 rounded-full text-xs text-amber-500">
+                  <div className="p-4 relative flex-grow">
+                    <div className="absolute top-4 left-4 z-10 bg-black/80 px-3 py-1.5 rounded-full text-xs text-amber-500 whitespace-nowrap">
                       LIMITED TO {product.pieces || 100} PIECES
                     </div>
-                    <div className="h-40 sm:h-48 md:h-52 flex items-center justify-center p-4">
+                    <div className="h-[240px] flex items-center justify-center p-4 bg-gradient-to-b from-transparent to-black/5 rounded-xl">
                       <img 
                         src={product.image} 
                         alt={product.name}
-                        className="max-h-full w-auto object-contain transform group-hover:scale-105 transition-transform duration-500"
+                        className="max-h-full w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 brightness-110"
                       />
                     </div>
                   </div>
-                  <div className="p-3 border-t border-gray-800/30 text-center">
-                    <div className="text-xs text-gray-400">{product.model}</div>
-                    <div className="text-white text-sm mt-0.5">{activeCategory === "keyboards" ? "AEGIS PRO" : 
-                      activeCategory === "mice" ? "NOVA SPECTER" : "QUANTUM DISPLAY"}</div>
-                    <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{product.description.slice(0, 40)}...</div>
+                  <div className="p-4 border-t border-gray-800/30 bg-black/40">
+                    <div className="text-sm text-gray-400">{product.model}</div>
+                    <div className="text-white text-base font-medium mt-1">{product.name}</div>
+                    <div className="text-sm text-gray-400 mt-1 line-clamp-2">{product.description}</div>
                   </div>
                 </div>
               ))}
@@ -611,10 +659,10 @@ const Products: React.FC = () => {
           </div>
 
           {/* Bottom navigation */}
-          <div className={`${getCardBgClass()} backdrop-blur-xl p-2 sm:p-3 border-t border-gray-800/30 relative z-10 flex-shrink-0`}>
+          <div className={`${getCardBgClass()} backdrop-blur-xl p-3 sm:p-4 border-t border-gray-800/30 relative z-10 flex-shrink-0 mt-auto`}>
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
-                <span className="text-white text-xs font-medium">
+                <span className="text-white text-xs sm:text-sm md:text-base font-medium">
                   PAGE {activePage} OF 3
                 </span>
               </div>
@@ -632,4 +680,4 @@ const Products: React.FC = () => {
   );
 };
 
-export default Products; 
+export default Products;

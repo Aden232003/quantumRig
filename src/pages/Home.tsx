@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Monitor, 
   Keyboard, 
@@ -8,7 +8,9 @@ import {
   Heart,
   User,
   ShoppingCart,
-  MenuIcon
+  MenuIcon,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 // Import local Aegis Pro images
@@ -22,6 +24,10 @@ import mouse3 from '/productImages/mouse3.png';
 import monitorMain from '/productImages/monitorMain.png';
 import monitor2 from '/productImages/monitor2.png';
 import monitor3 from '/productImages/monitor3.png';
+import pc1 from '/productImages/PC.png';
+import pc2 from '/productImages/pcKit.png';
+import pc3 from '/productImages/PCGPU.png';
+import fullSystem from '/productImages/FullPC.png';
 
 interface Product {
   id: number;
@@ -170,6 +176,54 @@ const products: Product[] = [
     limited: true,
     pieces: 35,
     color: "bg-emerald-900"
+  },
+  {
+    id: 11,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "High-performance gaming PC with RTX 4080, Intel i9, 64GB RAM",
+    price: "$2,999",
+    image: pc1,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-purple-900"
+  },
+  {
+    id: 12,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "Liquid-cooled system with custom loop and RGB lighting",
+    price: "$2,999",
+    image: pc2,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-blue-900"
+  },
+  {
+    id: 13,
+    name: "Quantum Core",
+    category: "Gaming PC",
+    description: "Premium build with tempered glass and aluminum chassis",
+    price: "$2,999",
+    image: pc3,
+    model: "QC-4080-i9",
+    limited: true,
+    pieces: 25,
+    color: "bg-indigo-900"
+  },
+  {
+    id: 14,
+    name: "Ultimate Setup",
+    category: "Full System",
+    description: "Complete gaming setup with PC, monitor, keyboard, and mouse",
+    price: "$4,999",
+    image: fullSystem,
+    model: "QR-ULTIMATE",
+    limited: true,
+    pieces: 10,
+    color: "bg-gray-900"
   }
 ];
 
@@ -196,6 +250,7 @@ const Home: React.FC = () => {
   const autoChangeRef = useRef<boolean>(true);
   const touchStartXRef = useRef<number | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
   // Function to determine card background opacity
   const getCardBgClass = () => {
@@ -296,6 +351,69 @@ const Home: React.FC = () => {
   const isNovaProduct = activeProduct >= 4 && activeProduct < 7;
   const isQuantumDisplay = activeProduct >= 7;
 
+  const handleWarrantyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.body.classList.add('page-transition');
+    
+    if (cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      
+      // Add blur effect to current card content
+      const blurOverlay = document.createElement('div');
+      blurOverlay.className = 'card-content-blur';
+      cardRef.current.appendChild(blurOverlay);
+      
+      // Create new card that will slide in
+      const newCard = cardRef.current.cloneNode(true) as HTMLElement;
+      newCard.style.position = 'fixed';
+      newCard.style.top = `${-rect.height}px`; // Start from above the viewport
+      newCard.style.left = `${rect.left}px`;
+      newCard.style.width = `${rect.width}px`;
+      newCard.style.height = `${rect.height}px`;
+      newCard.style.zIndex = '60';
+      newCard.className += ' card-clone card-clone-enter';
+      document.body.appendChild(newCard);
+      
+      // Navigate after animation
+      setTimeout(() => {
+        // Clean up
+        if (cardRef.current) {
+          cardRef.current.removeChild(blurOverlay);
+        }
+        document.body.removeChild(newCard);
+        document.body.classList.remove('page-transition');
+        navigate('/warranty');
+      }, 600);
+    } else {
+      // Fallback if card ref not available
+      navigate('/warranty');
+    }
+  };
+
+  // Function to get first product index for each category
+  const getFirstProductIndex = (category: string) => {
+    switch (category) {
+      case 'keyboard':
+        return 0; // Aegis Pro starts at index 0
+      case 'mouse':
+        return 4; // Nova Specter starts at index 4
+      case 'monitor':
+        return 7; // Quantum Display starts at index 7
+      case 'pc':
+        return 11; // Quantum Core starts at index 11
+      default:
+        return 0;
+    }
+  };
+
+  // Function to handle category filter click
+  const handleCategoryClick = (category: string) => {
+    const targetIndex = getFirstProductIndex(category);
+    if (targetIndex !== activeProduct) {
+      changeProduct(targetIndex);
+    }
+  };
+
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-100'} transition-colors duration-500 relative overflow-hidden`}>
       {/* Background blur with tint of the current product - OUTSIDE the card only */}
@@ -331,50 +449,47 @@ const Home: React.FC = () => {
                       className="text-gray-300 hover:text-white transition-colors"
                       onClick={(e) => {
                         e.preventDefault();
-                        // Add page transition animation class to body
                         document.body.classList.add('page-transition');
                         
-                        // Add overlay element
-                        const overlay = document.createElement('div');
-                        overlay.className = 'fixed inset-0 bg-black z-50 page-overlay';
-                        document.body.appendChild(overlay);
-                        
-                        // Clone current card and position it for animation
                         if (cardRef.current) {
                           const rect = cardRef.current.getBoundingClientRect();
-                          const clone = cardRef.current.cloneNode(true) as HTMLElement;
-                          clone.style.position = 'fixed';
-                          clone.style.top = `${rect.top}px`;
-                          clone.style.left = `${rect.left}px`;
-                          clone.style.width = `${rect.width}px`;
-                          clone.style.height = `${rect.height}px`;
-                          clone.style.zIndex = '60';
-                          clone.style.transition = 'all 0.5s ease-in-out';
-                          clone.style.transform = 'scale(1)';
-                          clone.className += ' card-clone';
-                          document.body.appendChild(clone);
                           
-                          // Animate the clone out
+                          // Add blur effect to current card content
+                          const blurOverlay = document.createElement('div');
+                          blurOverlay.className = 'card-content-blur';
+                          cardRef.current.appendChild(blurOverlay);
+                          
+                          // Create new card that will slide in
+                          const newCard = cardRef.current.cloneNode(true) as HTMLElement;
+                          newCard.style.position = 'fixed';
+                          newCard.style.top = `${-rect.height}px`; // Start from above the viewport
+                          newCard.style.left = `${rect.left}px`;
+                          newCard.style.width = `${rect.width}px`;
+                          newCard.style.height = `${rect.height}px`;
+                          newCard.style.zIndex = '60';
+                          newCard.className += ' card-clone card-clone-enter';
+                          document.body.appendChild(newCard);
+                          
+                          // Navigate after animation
                           setTimeout(() => {
-                            clone.style.transform = 'scale(1.1) translateY(-30px)';
-                            clone.style.opacity = '0';
-                            
-                            // Navigate after animation completes
-                            setTimeout(() => {
-                              window.location.href = '/products';
-                            }, 500);
-                          }, 100);
+                            // Clean up
+                            if (cardRef.current) {
+                              cardRef.current.removeChild(blurOverlay);
+                            }
+                            document.body.removeChild(newCard);
+                            document.body.classList.remove('page-transition');
+                            navigate('/products');
+                          }, 600);
                         } else {
                           // Fallback if card ref not available
-                          setTimeout(() => {
-                            window.location.href = '/products';
-                          }, 600);
+                          navigate('/products');
                         }
                       }}
                     >PRODUCTS</Link>
-                    <Link to="/watches" className="text-gray-300 hover:text-white transition-colors">WATCHES</Link>
-                    <a href="#" className="text-gray-300 hover:text-white transition-colors">WARRANTY & SERVICE</a>
-                    <a href="#" className="text-gray-300 hover:text-white transition-colors">STORES</a>
+                    <Link to="/warranty" 
+                      className="text-gray-300 hover:text-white transition-colors"
+                      onClick={handleWarrantyClick}
+                    >WARRANTY & SERVICE</Link>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 sm:space-x-6">
@@ -393,119 +508,191 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Main Product Display */}
-          <div className="p-6 sm:p-10 md:p-14 lg:p-16 relative z-10 flex-grow overflow-hidden">
-            {/* Touch navigation areas */}
-            <div className="touch-left" onClick={handleLeftClick}></div>
-            <div className="touch-right" onClick={handleRightClick}></div>
-            
-            {/* Product info tags */}
-            <div className="absolute top-4 sm:top-8 md:top-12 left-4 sm:left-8 md:left-12 flex items-center space-x-2 z-10">
-              <span className="text-xs sm:text-sm font-light text-white/70">{currentProduct.model}</span>
-              {currentProduct.limited && (
-                <span className={`ml-2 sm:ml-6 text-amber-400 text-xs sm:text-sm font-light opacity-80 hover:opacity-100 transition-opacity ${direction === 'right' ? 'slide-in-right' : 'slide-in-left'}`}>
-                  LIMITED TO {currentProduct.pieces} PIECES
-                </span>
-              )}
+          {/* Product Category Filters */}
+          <div className="px-6 py-4 border-b border-gray-800/30">
+            <div className="flex flex-wrap gap-2 md:gap-4">
+              <button
+                onClick={() => handleCategoryClick('keyboard')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  activeProduct < 4 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+              >
+                <Keyboard className="w-4 h-4" />
+                Keyboards
+              </button>
+              <button
+                onClick={() => handleCategoryClick('mouse')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  activeProduct >= 4 && activeProduct < 7 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+              >
+                <Mouse className="w-4 h-4" />
+                Mice
+              </button>
+              <button
+                onClick={() => handleCategoryClick('monitor')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  activeProduct >= 7 && activeProduct < 11 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+              >
+                <Monitor className="w-4 h-4" />
+                Monitors
+              </button>
+              <button
+                onClick={() => handleCategoryClick('pc')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  activeProduct >= 11 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+              >
+                <Cpu className="w-4 h-4" />
+                PCs
+              </button>
             </div>
-            <div className="absolute top-4 sm:top-8 md:top-12 right-4 sm:right-8 md:right-12 z-10">
-              <span className={`text-amber-400 text-xs sm:text-sm font-light opacity-80 hover:opacity-100 transition-opacity ${direction === 'right' ? 'slide-in-right' : 'slide-in-left'}`}>
-                AVAILABLE
-              </span>
-            </div>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-center h-full">
-              {/* Text Content */}
-              <div className="space-y-2 sm:space-y-4 relative flex flex-col justify-center h-full">
-                {/* Current Product (No Animation) */}
-                <div>
-                  {isAegisProduct ? (
-                    <>
-                      <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
-                      <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
-                        AEGIS PRO
-                      </h2>
-                      <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
-                      <div className="mt-3 sm:mt-6">
-                        <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
+          {/* Main Product Display */}
+          <div className="p-6 sm:p-10 md:p-14 lg:p-16 relative z-10 flex-grow overflow-hidden flex flex-col">
+            {/* Carousel Navigation Arrows */}
+            <button 
+              onClick={handleLeftClick}
+              className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm group"
+            >
+              <ChevronLeft className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            </button>
+            <button 
+              onClick={handleRightClick}
+              className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm group"
+            >
+              <ChevronRight className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            </button>
+
+            <div className="flex-grow flex flex-col justify-between">
+              {/* Product info tags */}
+              <div className="absolute top-4 sm:top-8 md:top-12 left-4 sm:left-8 md:left-12 flex items-center space-x-2 z-10">
+                <span className="text-xs sm:text-sm font-light text-white/70">{currentProduct.model}</span>
+                {currentProduct.limited && (
+                  <span className={`ml-2 sm:ml-6 text-amber-400 text-xs sm:text-sm font-light opacity-80 hover:opacity-100 transition-opacity ${direction === 'right' ? 'slide-in-right' : 'slide-in-left'}`}>
+                    LIMITED TO {currentProduct.pieces} PIECES
+                  </span>
+                )}
+              </div>
+              <div className="absolute top-4 sm:top-8 md:top-12 right-4 sm:right-8 md:right-12 z-10">
+                <span className={`text-amber-400 text-xs sm:text-sm font-light opacity-80 hover:opacity-100 transition-opacity ${direction === 'right' ? 'slide-in-right' : 'slide-in-left'}`}>
+                  AVAILABLE
+                </span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 items-center h-full">
+                {/* Text Content */}
+                <div className="space-y-2 sm:space-y-4 relative flex flex-col justify-start h-full">
+                  {/* Current Product (No Animation) */}
+                  <div className="mt-0">
+                    {isAegisProduct ? (
+                      <>
+                        <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
+                        <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
+                          AEGIS PRO
+                        </h2>
+                        <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
+                        <div className="mt-3 sm:mt-6">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
+                        </div>
+                        <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
+                          FIND OUT MORE
+                        </button>
+                      </>
+                    ) : isNovaProduct ? (
+                      <div className={`${animating && ((isAegisProduct !== (previousProduct < 4)) || (isQuantumDisplay !== (previousProduct >= 7))) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
+                        <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
+                        <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
+                          NOVA SPECTER
+                        </h2>
+                        <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
+                        <div className="mt-3 sm:mt-6">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
+                        </div>
+                        <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
+                          FIND OUT MORE
+                        </button>
                       </div>
-                      <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
-                        FIND OUT MORE
-                      </button>
-                    </>
-                  ) : isNovaProduct ? (
-                    <div className={`${animating && ((isAegisProduct !== (previousProduct < 4)) || (isQuantumDisplay !== (previousProduct >= 7))) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
-                      <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
-                      <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
-                        NOVA SPECTER
-                      </h2>
-                      <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
-                      <div className="mt-3 sm:mt-6">
-                        <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
+                    ) : (
+                      <div className={`${animating && ((isNovaProduct !== (previousProduct >= 4 && previousProduct < 7)) || (isAegisProduct !== (previousProduct < 4))) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
+                        <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
+                        <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
+                          QUANTUM DISPLAY
+                        </h2>
+                        <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
+                        <div className="mt-3 sm:mt-6">
+                          <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
+                        </div>
+                        <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
+                          FIND OUT MORE
+                        </button>
                       </div>
-                      <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
-                        FIND OUT MORE
-                      </button>
-                    </div>
-                  ) : (
-                    <div className={`${animating && ((isNovaProduct !== (previousProduct >= 4 && previousProduct < 7)) || (isAegisProduct !== (previousProduct < 4))) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
-                      <div className="text-gray-400 text-xs sm:text-sm">{currentProduct.category}</div>
-                      <h2 className="product-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
-                        QUANTUM DISPLAY
-                      </h2>
-                      <p className="text-gray-400 text-xs sm:text-sm md:text-base lg:text-lg mt-2 sm:mt-3">{currentProduct.description}</p>
-                      <div className="mt-3 sm:mt-6">
-                        <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient">{currentProduct.price}</span>
-                      </div>
-                      <button className="find-out-more mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-10 py-2 sm:py-4 text-xs sm:text-sm">
-                        FIND OUT MORE
-                      </button>
-                    </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Product Images */}
+                <div className="flex justify-end items-center relative mr-2 sm:mr-8">
+                  {/* Previous Product Image (Animating Out) */}
+                  {animating && (
+                    <img 
+                      src={products[previousProduct].image} 
+                      alt={products[previousProduct].name}
+                      className={`absolute h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] max-h-[500px] w-auto object-contain product-shadow ${direction === 'right' ? 'slide-out-left' : 'slide-out-right'}`}
+                    />
                   )}
+                  
+                  {/* Current Product Image */}
+                  <img 
+                    src={currentProduct.image} 
+                    alt={currentProduct.name}
+                    className={`h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] max-h-[500px] w-auto object-contain product-shadow float-animation ${animating ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}
+                  />
                 </div>
               </div>
-              
-              {/* Product Images */}
-              <div className="flex justify-end items-center relative mr-2 sm:mr-8">
-                {/* Previous Product Image (Animating Out) */}
-                {animating && (
-                  <img 
-                    src={products[previousProduct].image} 
-                    alt={products[previousProduct].name}
-                    className={`absolute h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] max-h-[500px] w-auto object-contain product-shadow ${direction === 'right' ? 'slide-out-left' : 'slide-out-right'}`}
-                  />
-                )}
-                
-                {/* Current Product Image */}
-                <img 
-                  src={currentProduct.image} 
-                  alt={currentProduct.name}
-                  className={`h-[40vh] sm:h-[45vh] md:h-[50vh] lg:h-[60vh] max-h-[500px] w-auto object-contain product-shadow float-animation ${animating ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}
-                />
-              </div>
-            </div>
 
-            {/* Bottom feature bar */}
-            <div className="flex justify-between items-center mt-4 sm:mt-6 md:mt-8 pt-3 sm:pt-4 md:pt-6 border-t border-gray-800">
-              <div className="flex items-center space-x-1 sm:space-x-2 text-gray-400 text-xs sm:text-sm">
-                <Keyboard className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span>PREMIUM BUILD</span>
-              </div>
-              
-              {/* Product pagination dots */}
-              <div className="flex items-center space-x-1">
-                {products.map((_, index) => (
-                  <button
-                    key={`product-${index}`}
-                    onClick={() => changeProduct(index)}
-                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-300 ${activeProduct === index ? 'bg-amber-400' : 'bg-gray-700'}`}
-                  />
-                ))}
-              </div>
-              
-              <div className="flex items-center space-x-1 sm:space-x-2 text-gray-400 text-xs sm:text-sm">
-                <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                <span>HIGH PERFORMANCE</span>
+              {/* Bottom feature bar with enhanced dots */}
+              <div className="flex justify-between items-center mt-4 sm:mt-6 md:mt-8 pt-3 sm:pt-4 md:pt-6 border-t border-gray-800">
+                <div className="flex items-center space-x-1 sm:space-x-2 text-gray-400 text-xs sm:text-sm">
+                  <Keyboard className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <span>PREMIUM BUILD</span>
+                </div>
+                
+                {/* Enhanced Product pagination dots */}
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="flex items-center space-x-2">
+                    {products.map((_, index) => (
+                      <button
+                        key={`product-${index}`}
+                        onClick={() => changeProduct(index)}
+                        className={`group relative`}
+                      >
+                        <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                          activeProduct === index 
+                            ? 'bg-amber-400 scale-110' 
+                            : 'bg-gray-700 hover:bg-gray-600'
+                        }`} />
+                        {/* Hover preview */}
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                          <div className="bg-black/80 rounded px-2 py-1 text-xs text-white whitespace-nowrap">
+                            {products[index].name}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {/* Current product number */}
+                  <div className="text-xs text-gray-400">
+                    {activeProduct + 1} / {products.length}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-1 sm:space-x-2 text-gray-400 text-xs sm:text-sm">
+                  <Cpu className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  <span>HIGH PERFORMANCE</span>
+                </div>
               </div>
             </div>
           </div>
@@ -515,7 +702,10 @@ const Home: React.FC = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <span className={`text-white text-xs sm:text-sm md:text-base font-medium uppercase ${animating && (isAegisProduct !== (previousProduct < 4)) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
-                  {currentProduct.name}
+                  {isAegisProduct ? "AEGIS PRO" : 
+                   isNovaProduct ? "NOVA SPECTER" : 
+                   isQuantumDisplay ? "QUANTUM DISPLAY" :
+                   currentProduct.name}
                 </span>
                 <span className={`text-gray-400 text-xs ${animating && (isAegisProduct !== (previousProduct < 4)) ? (direction === 'right' ? 'slide-in-right' : 'slide-in-left') : ''}`}>
                   {currentProduct.model}
