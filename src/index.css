@@ -1,0 +1,232 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+  
+  /* Modern font styling for product titles */
+  h2.product-title {
+    @apply uppercase font-bold tracking-wide;
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+  }
+  
+  /* Button styling to match reference */
+  .find-out-more {
+    @apply uppercase text-xs font-medium tracking-wider;
+    letter-spacing: 0.1em;
+    border-radius: 30px;
+  }
+}
+
+@layer utilities {
+  .backdrop-blur-3xl {
+    backdrop-filter: blur(64px);
+  }
+  
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(24px);
+  }
+  
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  .product-shadow {
+    filter: drop-shadow(0px 30px 30px rgba(0, 0, 0, 0.5));
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, #f5b64c 0%, #e8903a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .card-container {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .product-tint-overlay {
+    @apply absolute inset-0 z-0 pointer-events-none;
+    background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+    mix-blend-mode: multiply;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Improved Carousel animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.4s forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.4s forwards;
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.4s forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.4s forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.7; }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scale-up {
+  animation: scaleUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Touch areas for navigation */
+.touch-left, .touch-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.touch-left {
+  left: 0;
+}
+
+.touch-right {
+  right: 0;
+}
+
+.product-title {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Page transition animations */
+.page-transition {
+  overflow: hidden;
+}
+
+.page-overlay {
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+.card-clone {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backface-visibility: hidden;
+}
+
+/* Products page card entry animation */
+.card-container {
+  animation: cardEnter 0.6s ease-out;
+}
+
+@keyframes cardEnter {
+  from {
+    transform: translateY(30px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from { opacity: 0.7; }
+  to { opacity: 0; }
+}
+
+/* Add fade-in animation for product cards */
+.product-card {
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+  animation-delay: calc(var(--card-index) * 0.1s);
+}
+
+/* Add line-clamp for truncating text */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
