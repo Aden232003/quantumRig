@@ -112,7 +112,3 @@ In the project directory, you can run:
 ## Contributing
 
 Contributions are welcome! Please follow standard practices like creating feature branches and submitting pull requests.
-
-## License
-
-[MIT](LICENSE) (Assuming MIT license - create a LICENSE file if needed) 
